@@ -14,6 +14,7 @@ public class Client {
 	private String accesToken = null;
 	private String accesTokenParameterName = "access_token";
 	private String scope = "sales";
+	private String responseType = "code";
 	private String redirectUri = null;
 	
 	public static final String HTTP_METHOD_GET = "GET";
@@ -32,31 +33,7 @@ public class Client {
 		this.clientSecret = clientSecret;
 	}
 	
-	
-	public String getAuthenticationURL(String authorizationEndpoint, String redirectURI) {
 		
-		StringBuffer url = new StringBuffer(authorizationEndpoint);
-		
-		Map<String, String> URIParameters = new HashMap<String, String>();
-		URIParameters.put("response_type", "code");
-		URIParameters.put("client_id", clientId);
-		URIParameters.put("redirect_uri", redirectURI);
-		URIParameters.put("scope", scope);
-		URIParameters.put("state", String.valueOf(Math.random() * 100000));
-		
-		url.append("?");
-		for (Map.Entry<String, String> URIParametersEntry : URIParameters.entrySet()) {
-			String URIParameter = URIParametersEntry.getKey();
-			url.append("=");
-			String URIParameterValue = URIParametersEntry.getValue();
-			url.append("&");
-		}
-		url.deleteCharAt(url.length()); /* Removes last char: & */
-		
-		return url;
-	}
-	
-
 	public String getClientId() {
 		return clientId;
 	}
@@ -112,6 +89,15 @@ public class Client {
 	public void setRedirectUri(String redirectUri) {
 		this.redirectUri = redirectUri;
 	}
+
+	public String getResponseType() {
+		return responseType;
+	}
+
+	public void setResponseType(String responseType) {
+		this.responseType = responseType;
+	}
+	
 	
 	
 }
