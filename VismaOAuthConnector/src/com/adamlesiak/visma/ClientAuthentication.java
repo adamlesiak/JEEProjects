@@ -3,9 +3,18 @@ package com.adamlesiak.visma;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * Class for client authentication on the Visma website
+ * 
+ * 
+ * @author Adam Lesiak <adamlesiak@adamlesiak.com>
+ *
+ */
+
 public class ClientAuthentication {
 
 	private Client client;
+
 	
 	/**
 	 * Constructor 
@@ -23,7 +32,7 @@ public class ClientAuthentication {
 	 * @return String url
 	 */
 	
-	public String getAuthenticationURL(String authorizationEndpointURL, String redirectURI) {
+	public String getAuthenticationURL(String authorizationEndpointURL) {
 		
 		StringBuffer url = new StringBuffer(authorizationEndpointURL);
 		
@@ -31,7 +40,7 @@ public class ClientAuthentication {
 		
 		URIParameters.put("response_type", client.getResponseType());
 		URIParameters.put("client_id", client.getClientId());
-		URIParameters.put("redirect_uri", redirectURI);
+		URIParameters.put("redirect_uri", client.getRedirectURI());
 		URIParameters.put("scope", client.getScope());
 		URIParameters.put("state", String.valueOf((int)(Math.random() * 100000)));
 		
@@ -56,6 +65,7 @@ public class ClientAuthentication {
 	public void setClient(Client client) {
 		this.client = client;
 	}
+	
 	
 	
 	
