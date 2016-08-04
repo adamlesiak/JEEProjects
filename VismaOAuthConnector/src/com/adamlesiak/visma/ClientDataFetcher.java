@@ -9,9 +9,6 @@ import java.util.List;
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.auth.AuthScope;
-import org.apache.http.auth.Credentials;
-import org.apache.http.auth.UsernamePasswordCredentials;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
@@ -61,23 +58,25 @@ public class ClientDataFetcher {
 						
 		StringBuffer accessTokenBuffer = new StringBuffer();			
 		HttpClient httpClient = HttpClientBuilder.create().build();
-        HttpPost post = new HttpPost(tokenEndpoint);
+		HttpPost post = new HttpPost(tokenEndpoint);
 		
-        List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
-        nameValuePairs.add(new BasicNameValuePair("grant_type", client.getGrantTypeAuhorizationCode()));
-        nameValuePairs.add(new BasicNameValuePair("code", code));
-        nameValuePairs.add(new BasicNameValuePair("client_id", client.getClientId()));
-        nameValuePairs.add(new BasicNameValuePair("client_secret", client.getClientSecret()));
-        post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
-        
-        HttpResponse response = httpClient.execute(post);
-        BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
-        
-        String line = "";
-        while ((line = reader.readLine()) != null) {
-        	accessTokenBuffer.append(line);
-        }
-
+		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
+		nameValuePairs.add(new BasicNameValuePair("grant_type", client.getGrantTypeAuhorizationCode()));
+		nameValuePairs.add(new BasicNameValuePair("code", code));
+		nameValuePairs.add(new BasicNameValuePair("client_id", client.getClientId()));
+		nameValuePairs.add(new BasicNameValuePair("client_secret", client.getClientSecret()));
+		nameValuePairs.add(new BasicNameValuePair("username", client.getClientId()));
+		nameValuePairs.add(new BasicNameValuePair("password", client.getClientSecret()));
+		post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+		
+		HttpResponse response = httpClient.execute(post);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+		
+		String line = "";
+		while ((line = reader.readLine()) != null) {
+			accessTokenBuffer.append(line);
+		}
+		
 		accessToken = accessTokenBuffer.toString();
 	}
 		
