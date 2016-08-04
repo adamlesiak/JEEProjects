@@ -1,17 +1,12 @@
 package com.adamlesiak.visma;
 
-import java.security.KeyStore.Entry;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 public class Client {
 	
 	private String clientId = null;
 	private String clientSecret = null;
 	private String grantTypeAuhorizationCode = "authorization_code";
-	private String accesToken = null;
+	private String accessToken = null;
 	private String accesTokenParameterName = "access_token";
 	private String scope = "sales";
 	private String responseType = "code";
@@ -32,8 +27,7 @@ public class Client {
 		this.clientId = clientId;
 		this.clientSecret = clientSecret;
 	}
-	
-		
+			
 	public String getClientId() {
 		return clientId;
 	}
@@ -56,14 +50,6 @@ public class Client {
 
 	public void setGrantTypeAuhorizationCode(String grantTypeAuhorizationCode) {
 		this.grantTypeAuhorizationCode = grantTypeAuhorizationCode;
-	}
-
-	public String getAccesToken() {
-		return accesToken;
-	}
-
-	public void setAccesToken(String accesToken) {
-		this.accesToken = accesToken;
 	}
 
 	public String getAccesTokenParameterName() {
@@ -97,7 +83,15 @@ public class Client {
 	public void setResponseType(String responseType) {
 		this.responseType = responseType;
 	}
+
+	public String getAccessToken() {
+		return accessToken;
+	}
+
+	public void setAccessToken(String accessToken) {
+		this.accessToken = accessToken;
+	}
 	
 	
-	
+			
 }

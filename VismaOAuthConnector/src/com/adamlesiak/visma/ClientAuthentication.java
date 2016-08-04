@@ -23,9 +23,9 @@ public class ClientAuthentication {
 	 * @return String url
 	 */
 	
-	public String getAuthenticationURL(String authorizationEndpoint, String redirectURI) {
+	public String getAuthenticationURL(String authorizationEndpointURL, String redirectURI) {
 		
-		StringBuffer url = new StringBuffer(authorizationEndpoint);
+		StringBuffer url = new StringBuffer(authorizationEndpointURL);
 		
 		Map<String, String> URIParameters = new HashMap<String, String>();
 		
@@ -48,5 +48,15 @@ public class ClientAuthentication {
 		
 		return url.toString();
 	}
+
+	public Client getClient() {
+		return client;
+	}
+
+	public void setClient(Client client) {
+		this.client = client;
+	}
+	
+	
 	
 }
