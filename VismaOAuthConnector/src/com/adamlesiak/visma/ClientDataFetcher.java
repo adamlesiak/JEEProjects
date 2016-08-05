@@ -94,10 +94,7 @@ public class ClientDataFetcher {
 		}
 		
 		JSONObject jsonObject = new JSONObject(accessTokenBuffer.toString());
-		JSONArray jsonArray = jsonObject.getJSONArray("");
-		for (int i = 0; i < jsonArray.length(); i++) {
-			accessToken = jsonArray.getJSONObject(i).getString(accesTokenParameterName);
-		}
+		accessToken = jsonObject.getString(accesTokenParameterName);
 		
 	}
 		
