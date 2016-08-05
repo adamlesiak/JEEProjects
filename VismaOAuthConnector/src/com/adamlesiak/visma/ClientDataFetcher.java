@@ -4,16 +4,26 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Base64;
 import java.util.List;
 
 
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
+import org.apache.http.auth.AuthScope;
+import org.apache.http.auth.AuthenticationException;
+import org.apache.http.auth.UsernamePasswordCredentials;
+import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
 import org.apache.http.client.methods.HttpPost;
+import org.apache.http.client.params.HttpClientParams;
+import org.apache.http.impl.auth.BasicScheme;
+import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
+import org.json.JSONObject;
 
 /**
  * 
@@ -53,21 +63,27 @@ public class ClientDataFetcher {
 	 * @param tokenEndpoint
 	 * @return
 	 * @throws IOException 
+	 * @throws AuthenticationException 
 	 */	
-	public void requestAccessToken(String tokenEndpoint) throws IOException {
+	@SuppressWarnings("deprecation")
+	public void requestAccessToken(String tokenEndpoint) throws IOException, AuthenticationException {
 						
 		StringBuffer accessTokenBuffer = new StringBuffer();			
 		HttpClient httpClient = HttpClientBuilder.create().build();
 		HttpPost post = new HttpPost(tokenEndpoint);
-		
+	    
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
 		nameValuePairs.add(new BasicNameValuePair("grant_type", client.getGrantTypeAuhorizationCode()));
+		nameValuePairs.add(new BasicNameValuePair("redirect_uri", client.getRedirectURI()));
 		nameValuePairs.add(new BasicNameValuePair("code", code));
 		nameValuePairs.add(new BasicNameValuePair("client_id", client.getClientId()));
 		nameValuePairs.add(new BasicNameValuePair("client_secret", client.getClientSecret()));
 		nameValuePairs.add(new BasicNameValuePair("username", client.getClientId()));
 		nameValuePairs.add(new BasicNameValuePair("password", client.getClientSecret()));
 		post.setEntity(new UrlEncodedFormEntity(nameValuePairs));
+		
+		String userAndPassord = new String (org.apache.commons.codec.binary.Base64.encodeBase64((client.getClientId() + ":" + client.getClientSecret()).getBytes()));		
+		post.setHeader("Authorization", "Basic " + userAndPassord);
 		
 		HttpResponse response = httpClient.execute(post);
 		BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
@@ -77,7 +93,12 @@ public class ClientDataFetcher {
 			accessTokenBuffer.append(line);
 		}
 		
-		accessToken = accessTokenBuffer.toString();
+		JSONObject jsonObject = new JSONObject(accessTokenBuffer.toString());
+		JSONArray jsonArray = jsonObject.getJSONArray("");
+		for (int i = 0; i < jsonArray.length(); i++) {
+			accessToken = jsonArray.getJSONObject(i).getString(accesTokenParameterName);
+		}
+		
 	}
 		
 	public Client getClient() {
