@@ -100,8 +100,8 @@ public class ClientDataFetcher {
 		accessToken = jsonObject.getString(accesTokenParameterName);		
 	}
 	
-	public void sendDataJSON(String url, String accesToken, String JSON) throws IOException {
-	
+	public HttpResponse sendDataJSON(String url, String accesToken, String JSON) throws IOException {
+			
 		HttpClient httpClient = HttpClientBuilder.create().build();
 		HttpPost post = new HttpPost(url);
 	    		
@@ -121,13 +121,32 @@ public class ClientDataFetcher {
 		}
 		System.out.println("Acces token: " + accesToken);
 		
-		BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
 		
+		
+		/*Reads ID from response JSON */
+		
+		return response;
+		
+	}
+	
+	public ResponseObject fetchResponse(HttpResponse response) throws IOException {
+		String responseJSON = "";
 		String line = "";
-		System.out.println("SERVER RESPONSE: ");
+		String createdObjectId = null;
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));		
 		while ((line = reader.readLine()) != null) {
-			System.out.println(line);
+			responseJSON = line;
 		}
+		
+		try {
+			JSONObject jsonObject = new JSONObject(responseJSON);
+			jsonObject.getString("Id");
+		} catch (org.json.JSONException e) {
+			
+		}
+		ResponseObject responseObject = new ResponseObject(response.getStatusLine().getStatusCode(), createdObjectId);
+		return responseObject;
 	}
 		
 	public Client getClient() {
