@@ -47,7 +47,8 @@ public class ClientDataFetcher {
 	/**
 	 * Constructor
 	 * 
-	 * @param clientAuthentication
+	 * @param Cient client
+	 * @param String code - char sequence taken from Visma callback after success user authentication
 	 */
 	public ClientDataFetcher(Client client, String code) {
 		this.client = client;
@@ -56,7 +57,6 @@ public class ClientDataFetcher {
 	
 	/**
 	 * This method gets a token named "access_token" - a unique char sequence for authorize user.
-	 * This method gets a parametel named "data" - it is a char sequence taken from Visma callback after success user authentication
 	 * With this token (valid for 60 minutes) client can fetch or send (insert, update) data.
 	 * IMPORTANT: It is a Visma specification only.
 	 * 
@@ -69,11 +69,11 @@ public class ClientDataFetcher {
 	 * @throws IOException 
 	 * @throws AuthenticationException 
 	 */	
-	public void requestAccessToken(String tokenEndpoint) throws IOException, AuthenticationException {
+	public void requestAccessToken(String tokenEndPoint) throws IOException, AuthenticationException {
 						
 		StringBuffer accessTokenBuffer = new StringBuffer();			
 		HttpClient httpClient = HttpClientBuilder.create().build();
-		HttpPost post = new HttpPost(tokenEndpoint);
+		HttpPost post = new HttpPost(tokenEndPoint);
 	    
 		List<NameValuePair> nameValuePairs = new ArrayList<NameValuePair>(1);
 		nameValuePairs.add(new BasicNameValuePair("grant_type", client.getGrantTypeAuhorizationCode()));
@@ -100,36 +100,44 @@ public class ClientDataFetcher {
 		accessToken = jsonObject.getString(accesTokenParameterName);		
 	}
 	
-	public HttpResponse sendDataJSON(String url, String accesToken, String JSON) throws IOException {
-			
+	/**
+	 * 
+	 * Sends a JSON data to Visma app and returns a HttpResponse object with feedback informations
+	 * 
+	 * From Visma documentation cURL looks like:
+	 * curl [LINK] -H "Authorization: Bearer [ACCESS_TOKEN]" -H "Content-Type: application/json; charset=utf-8" -X POST -d '[JSON_DATA]'
+	 * 
+	 * 
+	 * @param url - url to Visma application
+	 * @param accessToken - received access token
+	 * @param JSON - string JSON data
+	 * 
+	 * @return HttpResponse
+	 * 
+	 */
+	
+	public HttpResponse sendDataJSON(String url, String accesToken, String JSON) throws IOException {			
+		
 		HttpClient httpClient = HttpClientBuilder.create().build();
 		HttpPost post = new HttpPost(url);
 	    		
 		StringEntity entity = new StringEntity(JSON, ContentType.APPLICATION_JSON);
 		post.setEntity(entity);
-		post.setHeader("Authorization", "Bearer " + accesToken);
-		///post.setHeader("Content-type", "application/json");
-				
-		HttpResponse response = httpClient.execute(post);
-		System.out.println("SEND POST RESPONSE: " + response);
-		System.out.println("URI: " + post.getURI());
-		System.out.println("Request line: " + post.getRequestLine());
-		
-		Header[] headers = response.getAllHeaders();
-		for(Header header : headers) {
-			System.out.println(header.toString());
-		}
-		System.out.println("Acces token: " + accesToken);
-		
-		
-		
-		/*Reads ID from response JSON */
-		
-		return response;
-		
+		post.setHeader("Authorization", "Bearer " + accesToken);				
+		HttpResponse response = httpClient.execute(post);								
+		return response;		
 	}
 	
-	public ResponseObject fetchResponse(HttpResponse response) throws IOException {
+	/**
+	 * 
+	 * Fetching from HttpResponse to ResponseLog for more flexible read and managing response data
+	 * 
+	 * @param response - HTTP response
+	 * @return com.adamlesiak.visma.ResponseLog
+	 * @throws IOException
+	 */
+	
+	public ResponseLog fetchResponse(HttpResponse response) throws IOException {
 		String responseJSON = "";
 		String line = "";
 		String createdObjectId = null;
@@ -138,16 +146,21 @@ public class ClientDataFetcher {
 		while ((line = reader.readLine()) != null) {
 			responseJSON = line;
 		}
-		
+						
 		try {
 			JSONObject jsonObject = new JSONObject(responseJSON);
-			jsonObject.getString("Id");
+			createdObjectId = jsonObject.getString("Id");
 		} catch (org.json.JSONException e) {
-			
+			//:TODO: Exception handling is not necessary right now
 		}
-		ResponseObject responseObject = new ResponseObject(response.getStatusLine().getStatusCode(), createdObjectId);
+		
+		ResponseLog responseObject = new ResponseLog(response.getStatusLine().getStatusCode(), createdObjectId);
 		return responseObject;
 	}
+	
+	/**
+	 * Getters and setters
+	 */
 		
 	public Client getClient() {
 		return client;
