@@ -3,37 +3,27 @@ package com.adamlesiak.visma;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
-import java.util.Base64;
 import java.util.List;
 
-import org.apache.http.Header;
 import org.apache.http.HttpResponse;
 import org.apache.http.NameValuePair;
-import org.apache.http.auth.AuthScope;
 import org.apache.http.auth.AuthenticationException;
-import org.apache.http.auth.UsernamePasswordCredentials;
-import org.apache.http.client.ClientProtocolException;
-import org.apache.http.client.CredentialsProvider;
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpGet;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.params.HttpClientParams;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
-import org.apache.http.impl.auth.BasicScheme;
-import org.apache.http.impl.client.BasicCredentialsProvider;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
-import org.json.JSONArray;
 import org.json.JSONObject;
 
 /**
  * 
  * Class for data fetching and sending after authorize
  * 
- * @author Adam Lesiak <adamlesiak@adamlesiak.com
+ * @author Adam Lesiak <adamlesiak@adamlesiak.com>
  *
  */
 
@@ -156,6 +146,52 @@ public class ClientDataFetcher {
 		
 		ResponseLog responseObject = new ResponseLog(response.getStatusLine().getStatusCode(), createdObjectId);
 		return responseObject;
+	}
+	
+	/**
+	 * 
+	 * Sends a request o Visma app and returns a JSON data
+	 * 
+	 * From Visma documentation cURL looks like:
+	 * curl [LINK] -H "Authorization: Bearer [ACCESS_TOKEN]" -H "Content-Type: application/json; charset=utf-8"'
+	 * 
+	 * 
+	 * @param url - url to Visma application
+	 * @param accessToken - received access token
+	 * 
+	 * @return HttpResponse
+	 * 
+	 */
+	
+	public HttpResponse getResponse(String url, String accesToken) throws IOException {			
+		
+		HttpClient httpClient = HttpClientBuilder.create().build();
+		HttpGet get = new HttpGet(url);
+	    		
+		get.setHeader("Authorization", "Bearer " + accesToken);				
+		HttpResponse response = httpClient.execute(get);
+		System.out.println(response);
+		return response;		
+	}
+	
+	/**
+	 * 
+	 * Fetching from HttpResponse to ResponseLog for more flexible read and managing response data
+	 * 
+	 * @param response - HTTP response
+	 * @return com.adamlesiak.visma.ResponseLog
+	 * @throws IOException
+	 */
+	
+	public String getJSON(HttpResponse response) throws IOException {
+		String responseJSON = "";
+		String line = "";
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));
+		while ((line = reader.readLine()) != null) {
+			responseJSON += line;
+		}				
+		return responseJSON;
 	}
 	
 	/**
