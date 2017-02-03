@@ -4,6 +4,7 @@ import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
 
 import org.apache.http.HttpResponse;
@@ -17,7 +18,9 @@ import org.apache.http.entity.ContentType;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.message.BasicNameValuePair;
+import org.json.JSONArray;
 import org.json.JSONObject;
+import org.json.JSONString;
 
 /**
  * 
@@ -130,6 +133,8 @@ public class ClientDataFetcher {
 	public ResponseLog fetchResponse(HttpResponse response) throws IOException {
 		String responseJSON = "";
 		String line = "";
+		String message = "";
+		String additionalMessage = "";
 		String createdObjectId = null;
 		
 		BufferedReader reader = new BufferedReader(new InputStreamReader(response.getEntity().getContent()));		
@@ -143,8 +148,34 @@ public class ClientDataFetcher {
 		} catch (org.json.JSONException e) {
 			//:TODO: Exception handling is not necessary right now
 		}
+		try {
+			JSONObject jsonObject = new JSONObject(responseJSON);
+			message = jsonObject.getString("Message");			
+		} catch (org.json.JSONException e) {
+			//:TODO: Exception handling is not necessary right now
+		}
+		try {
+			JSONObject jsonObject = new JSONObject(responseJSON);
+			JSONObject modelState = jsonObject.getJSONObject("ModelState");
+			Iterator<?> keys = modelState.keys();
+			while( keys.hasNext() ) {
+			    String key = (String)keys.next();
+			    if ( modelState.get(key) instanceof JSONObject ) {
+			    	additionalMessage += key + ":" + modelState.get(key).toString();
+			    }
+			    if ( modelState.get(key) instanceof JSONArray ) {
+			    	JSONArray a = (JSONArray) modelState.get(key);
+			    	for (int i = 0; i < a.length(); i++) {
+			    		additionalMessage += key + ":" + a.getString(i);	
+			    	}
+			    	
+			    }
+			}			
+		} catch (org.json.JSONException e) {
+			//:TODO: Exception handling is not necessary right now
+		}
 		
-		ResponseLog responseObject = new ResponseLog(response.getStatusLine().getStatusCode(), createdObjectId);
+		ResponseLog responseObject = new ResponseLog(response.getStatusLine().getStatusCode(), createdObjectId, message, additionalMessage);
 		return responseObject;
 	}
 	

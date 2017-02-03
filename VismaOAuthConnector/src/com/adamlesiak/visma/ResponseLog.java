@@ -21,6 +21,12 @@ public class ResponseLog {
 	public static final int HTTP_STATUS_CODE_CREATED = 201;
 	
 	/**
+	 * Status Code: 400
+	 * Unauthorized - error in authorization. Client ID or Client Secret invalid
+	 */
+	public static final int HTTP_STATUS_CODE_BAD_REQUEST = 400;
+	
+	/**
 	 * Status Code: 401
 	 * Unauthorized - error in authorization. Client ID or Client Secret invalid
 	 */
@@ -37,12 +43,15 @@ public class ResponseLog {
 	 * Messages for HTTP statuses
 	 */
 	public static final String HTTP_STATUS_CODE_CREATED_MESSAGE = "The object has been successful exported.";
+	public static final String HTTP_STATUS_CODE_BAD_REQUEST_MESSAGE = "Bad request. The sent request contains wrong fields or data.";
 	public static final String HTTP_STATUS_CODE_UNAUTHORIZED_MESSAGE = "Authorization failed.";
 	public static final String HTTP_STATUS_CODE_CONFLICT_MESSAGE = "Conflict. Export failed";
 	
 	
 	private int statusCode;
-	private String returnedId;
+	private String returnedId;	
+	private String message;
+	private String additionalMessage;
 	private Map<Integer, String> messagesMap;
 	
 	/**
@@ -50,9 +59,11 @@ public class ResponseLog {
 	 * @param statusCode - HTTP status code
 	 * @param returnedId - returned ID from Visma after successful insertion of object
 	 */	
-	public ResponseLog(int statusCode, String returnedId) {
+	public ResponseLog(int statusCode, String returnedId, String message, String additionalMessage) {
 		this.statusCode = statusCode;
 		this.returnedId = returnedId;
+		this.message = message;
+		this.additionalMessage = additionalMessage;
 		createMessagesMap();
 	}
 	
@@ -72,6 +83,7 @@ public class ResponseLog {
 		messagesMap.put(HTTP_STATUS_CODE_CREATED, HTTP_STATUS_CODE_CREATED_MESSAGE);
 		messagesMap.put(HTTP_STATUS_CODE_UNAUTHORIZED, HTTP_STATUS_CODE_UNAUTHORIZED_MESSAGE);
 		messagesMap.put(HTTP_STATUS_CODE_CONFLICT, HTTP_STATUS_CODE_CONFLICT_MESSAGE);
+		messagesMap.put(HTTP_STATUS_CODE_BAD_REQUEST, HTTP_STATUS_CODE_BAD_REQUEST_MESSAGE);
 	}
 	
 	
@@ -94,5 +106,23 @@ public class ResponseLog {
 	public void setReturnedId(String returnedId) {
 		this.returnedId = returnedId;
 	}
+	
+	public String getMessage() {
+		return message;
+	}
+
+	public void setMessage(String message) {
+		this.message = message;
+	}
+
+	public String getAdditionalMessage() {
+		return additionalMessage;
+	}
+
+	public void setAdditionalMessage(String additionalMessage) {
+		this.additionalMessage = additionalMessage;
+	}
+	
+	
 		
 }
